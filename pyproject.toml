@@ -7,7 +7,10 @@ authors = [
     { name = "Jan Ivar Korsbakken", email = "janko@cicero.oslo.no" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "fastexcel>=0.14.0",
+    "polars>=1.32.0",
+]
 
 [project.scripts]
 cicero-maru-utils = "cicero_maru_utils:main"
@@ -15,3 +18,8 @@ cicero-maru-utils = "cicero_maru_utils:main"
 [build-system]
 requires = ["uv_build>=0.8.4,<0.9.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.30.0",
+]
