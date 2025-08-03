@@ -12,92 +12,17 @@ import typing as tp
 import polars as pl
 import polars.selectors as cs
 
+from cicero_maru_utils.labels.columns import (
+    MaruCol,
+    MaruColOrig,
+    get_maru_cols,
+    get_maru_cols_original,
+)
+from cicero_maru_utils.versions import MaruVersion
 
 
-@dataclasses.dataclass(kw_only=True)
-class MaruColOrig:
-    year: str = 'year'
-    year_month: str = 'year_month'
-    gt_group: str = 'gt_group'
-    vessel_type: str = 'vessel_type'
-    phase: str = 'phase'
-    voyage_type: str = 'voyage_type'
-    ez_area_name: str = 'maritime_borders_norwegian_economic_zone_area_name'
-    mgmt_plan_area_name: str = 'management_plan_marine_areas_area_name_norwegian'
-    municipality_name: str = 'municipality_name'
-    county_name: str = 'county_name'
-    municipality_voyage_type: str = 'municipality_voyage_type'
-    time_sec: str = 'sum_seconds'
-    energy_kwh: str = 'sum_kwh'
-    kwh_battery: str|None = None
-    kwh_shore_power: str|None = None
-    fuel: str = 'sum_fuel'
-    co2: str = 'sum_co2'
-    nmvoc: str = 'sum_nmvoc'
-    co: str = 'sum_co'
-    ch4: str = 'sum_ch4'
-    n2o: str = 'sum_n2o'
-    sox: str = 'sum_sox'
-    pm10: str = 'sum_pm10'
-    pm2_5: str = 'sum_pm2_5'
-    nox: str = 'sum_nox'
-    bc: str = 'sum_bc'
-    co2e: str = 'sum_co2e'
-    distance_km: str = 'distance_kilometers'
-    version: str = 'version'
-    timestamp: str = 'timestamp_utc_generated'
 
-@dataclasses.dataclass
-class MaruCol(MaruColOrig):
-    municipality_number: str = 'municipality_number'
-    month: str = 'month'
-
-def get_maru_cols_original(version: tp.Literal['20241128', '20250304']) \
-        -> MaruColOrig:
-    """Get a dataclass of column names for the MarU data
-
-    Parameters
-    ----------
-    version : Literal['20241128', '20250304']
-        Which version to get column names for. Current versions offered are
-        '20241128' and '20250304'. For report files released on or after
-        2025-03-04, use '20250304'.
-
-    Returns
-    -------
-    MaruCol
-        MaruCol dataclass with column names. This includes columns that are
-        added or modified in processing the original Excel files into parquet
-        format.
-    """
-    valid_versions: tuple[str, ...] = ('20241128', '20250304')
-    if version == '20241128':
-        return MaruColOrig()
-    elif version == '20250304':
-        return MaruColOrig(
-            kwh_battery='sum_kwh_battery',
-            kwh_shore_power='sum_kwh_shore_power',
-        )
-    else:
-        raise ValueError(
-            f'Invalid value passed in `version`. Valid values are: '
-            f'{"\", \"".join(valid_versions)}'
-        )
-
-def get_maru_cols(version: tp.Literal['20241128', '20250304']) -> MaruCol:
-    """Get a dataclass of column names fo the MarU data, including
-    added/modified columns.
-
-    This function does the same as `get_maru_cols_original`, but also includes
-    columns that were added or modified during processing from Excel to parquet.
-    See the docstring of `get_maru_cols_original` for more details. It returns
-    a dataclass of type `MaruCol` instead of `MaruColOrig`.
-    """
-    orig_cols: MaruColOrig = get_maru_cols_original(version)
-    return MaruCol(**dataclasses.asdict(orig_cols))
-
-
-def get_source_schema(version: tp.Literal['20241128', '20250304']) \
+def get_source_schema(version: MaruVersion) \
         -> pl.Schema:
     """
     Defines and returns the expected Polars schema for the source Excel files.
@@ -438,14 +363,14 @@ def main() -> None:
         "--version",
         type=str,
         required=True,
-        choices=['20241128', '20250304'],
+        choices=[str(_member) for _member in MaruVersion],
         help="MarU report release version of the data.",
     )
     args = parser.parse_args()
 
     search_dir: Path = args.search_dir
     out_file: Path = args.out_file
-    version: tp.Literal['20241128', '20250304'] = args.version
+    version: MaruVersion = MaruVersion(args.version)
 
     # --- Pre-flight checks ---
     if not search_dir.is_dir():

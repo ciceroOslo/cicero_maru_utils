@@ -1,6 +1,6 @@
 [project]
 name = "cicero-maru-utils"
-version = "0.1.0"
+version = "0.2.0"
 description = "Utilities for processing and analyzing data from the maritime emissions model MarU from Kystverket"
 readme = "README.md"
 authors = [
