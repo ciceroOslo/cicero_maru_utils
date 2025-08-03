@@ -1,2 +1,2 @@
-# CICERO MarLU utilities
+# CICERO MarU utilities
 Utilities for processing and analyzing data from the maritime emissions model MarU from Kystverket
