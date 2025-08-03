@@ -280,9 +280,15 @@ def process_municipality_data(schema: pl.Schema) \
     municipality_schema: pl.Schema = pl.Schema(
         {
             'municipality_name': \
-                pl.Enum(municipality_df['municipality_name'].unique()),
+                pl.Enum(
+                    municipality_df['municipality_name']\
+                        .unique(maintain_order=True)
+                ),
             'municipality_number': \
-                pl.Enum(municipality_df['municipality_number'].unique()),
+                pl.Enum(
+                    municipality_df['municipality_number']\
+                        .unique(maintain_order=True)
+                ),
         }
     )
     return municipality_df, municipality_schema
