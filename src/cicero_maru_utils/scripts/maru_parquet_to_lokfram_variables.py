@@ -57,11 +57,29 @@ class OutputVarSpec:
             )
 
 
-def get_input_data_obj(in_file: Path|tp.IO[bytes]) -> InputObj:
-    """Get an input data object for the given input file object."""
+def get_input_data_obj(
+        in_file: Path|tp.IO[bytes],
+        maru_cols: MaruCol,
+        municipality_name: str,
+) -> InputObj:
+    """Get an input data object for the given input file object.
+
+    Note that this function currently materializes the input (filtered to the
+    correct municipality) and then re-lazies it before returning, in order to
+    avoid repeated materialization during processing.
+    """
     if isinstance(in_file, Path) and not in_file.exists():
         raise FileNotFoundError(f'Input file "{in_file}" does not exist.')
-    return pl.scan_parquet(in_file)
+    df: pl.DataFrame = (
+        pl.scan_parquet(in_file)
+        .filter(pl.col(maru_cols.municipality_name) == municipality_name)
+    ).collect()
+    if df.height == 0:
+        raise ValueError(
+            f'No data found for municipality "{municipality_name}".'
+        )
+    return df.lazy()
+
 
 def get_output_obj(out_file: Path|tp.IO[bytes]) -> OutputObj:
     """Get an output data object for the given output file object."""
@@ -127,19 +145,34 @@ def main() -> None:
         choices=[_member for _member in MaruVersion],
         help='MarU report release version of the data.',
     )
+    parser.add_argument(
+        '--municipality-name',
+        type=str,
+        required=True,
+        help=(
+            'Name of the municipality for which the output variables are '
+            'generated (not including municipality number).'
+        ),
+    )
 
     args: argparse.Namespace = parser.parse_args()
 
-    print(f'Opening input file "{args.in_file}"...')
     in_file: Path = args.in_file
-    print(f'Obtaining output object for output file "{args.out_file}"...')
     out_file: Path = args.out_file
+    municipality_name: str = args.municipality_name
 
-    input_obj: InputObj = get_input_data_obj(in_file)
-    output_obj: OutputObj = get_output_obj(out_file)
     maru_version: MaruVersion = args.version
-
     maru_cols: MaruCol = get_maru_cols(maru_version)
+
+    print(f'Opening input file "{args.in_file}"...')
+    input_obj: InputObj = get_input_data_obj(
+        in_file=in_file,
+        municipality_name=municipality_name,
+        maru_cols=maru_cols,
+    )
+    print(f'Obtaining output object for output file "{args.out_file}"...')
+    output_obj: OutputObj = get_output_obj(out_file)
+
 
     curr_var: str = '<no variables processed yet>'
     try:
