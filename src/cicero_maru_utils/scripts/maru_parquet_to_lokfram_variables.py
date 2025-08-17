@@ -7,7 +7,6 @@ The parquet file must have been produced from MarU Excel report files using
 `maru_xlsx_to_parquet`.
 """
 import argparse
-import dataclasses
 from pathlib import Path
 import typing as tp
 import sys
@@ -26,35 +25,6 @@ from cicero_maru_utils.labels.columns import (
 
 OutputObj: tp.TypeAlias = XlsxWorkbook
 InputObj: tp.TypeAlias = pl.LazyFrame
-
-class ProcessingFunc(tp.Protocol):
-    """Protocol for processing functions."""
-    def __call__(
-            self,
-            df: pl.LazyFrame,
-            *,
-            maru_cols: MaruCol,
-            output_var_name: str,
-            output_value_col: str|None = None,
-    ) -> pl.LazyFrame:
-        ...
-
-@dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
-class OutputVarSpec:
-    """Specification for an output variable."""
-    name: str
-    sheet_name: str
-    output_value_col: str|None = None
-    processing_func: ProcessingFunc
-
-    def __post_init__(self) -> None:
-        sheet_name: str = self.sheet_name
-        max_sheet_name_len: int = 31
-        if len(sheet_name) > max_sheet_name_len:
-            raise ValueError(
-                f'Sheet name "{sheet_name}" is too long. '
-                'It must be {max_sheet_name_len} characters or less.'
-            )
 
 
 def get_input_data_obj(
