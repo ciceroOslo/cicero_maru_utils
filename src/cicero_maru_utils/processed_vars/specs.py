@@ -8,6 +8,7 @@ import enum
 import typing as tp
 
 import polars as pl
+import polars.selectors as cs
 
 from cicero_maru_utils.labels.columns import MaruCol
 
@@ -46,6 +47,7 @@ def _process_energy_per_phase_kwh(
         .agg(
             pl.sum(maru_cols.energy_kwh).alias(output_value_col)
         )
+        .sort(cs.exclude(cs.by_name(output_value_col)))
     )
 
 
