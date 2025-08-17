@@ -42,7 +42,6 @@ def _process_energy_per_phase_kwh(
         output_value_col = maru_cols.energy_kwh
     return (
         df
-        .filter(pl.col(maru_cols.municipality_voyage_type) == 'Berthed')
         .group_by(*group_by_common, maru_cols.phase)
         .agg(
             pl.sum(maru_cols.energy_kwh).alias(output_value_col)
