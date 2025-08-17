@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!python
 """
 A command-line utility to find all Excel (.xlsx) files in a directory,
 consolidate them, and convert them into a single Apache Parquet file.
