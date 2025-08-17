@@ -27,6 +27,34 @@ from cicero_maru_utils.labels.columns import (
 OutputObj: tp.TypeAlias = XlsxWorkbook
 InputObj: tp.TypeAlias = pl.LazyFrame
 
+class ProcessingFunc(tp.Protocol):
+    """Protocol for processing functions."""
+    def __call__(
+            self,
+            df: pl.LazyFrame,
+            *,
+            output_value_col: str|None = None,
+    ) -> pl.LazyFrame:
+        ...
+
+@dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
+class OutputVarSpec:
+    """Specification for an output variable."""
+    name: str
+    sheet_name: str
+    output_value_col: str|None = None
+    processing_func: ProcessingFunc
+
+    def __post_init__(self) -> None:
+        sheet_name: str = self.sheet_name
+        max_sheet_name_len: int = 31
+        if len(sheet_name) > max_sheet_name_len:
+            raise ValueError(
+                f'Sheet name "{sheet_name}" is too long. '
+                'It must be {max_sheet_name_len} characters or less.'
+            )
+
+
 def get_input_data_obj(in_file: Path|tp.IO[bytes]) -> InputObj:
     """Get an input data object for the given input file object."""
     if isinstance(in_file, Path) and not in_file.exists():
