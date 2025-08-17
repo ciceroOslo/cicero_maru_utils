@@ -7,6 +7,7 @@ The parquet file must have been produced from MarU Excel report files using
 `maru_xlsx_to_parquet`.
 """
 import argparse
+from collections.abc import Mapping
 from pathlib import Path
 import typing as tp
 import sys
@@ -21,8 +22,13 @@ from cicero_maru_utils.labels.columns import (
     MaruVersion,
     get_maru_cols,
 )
+from cicero_maru_utils.processed_vars.specs import stavanger_output_specs_202508
+from cicero_maru_utils.processed_vars.types import OutputVarSpec
 
 
+
+output_var_specs: tp.Final[Mapping[str, OutputVarSpec]] \
+    = stavanger_output_specs_202508
 OutputObj: tp.TypeAlias = XlsxWorkbook
 InputObj: tp.TypeAlias = pl.LazyFrame
 
@@ -64,13 +70,14 @@ def process_and_write_output(
         output_obj: OutputObj,
         var_spec: OutputVarSpec,
         maru_cols: MaruCol,
+        output_value_col: str|None = None,
 ) -> pl.LazyFrame:
     """Process input data into a single variable and write to output object."""
     output_lf: pl.LazyFrame = var_spec.processing_func(
         df=input_obj,
         maru_cols=maru_cols,
         output_var_name=var_spec.name,
-        output_value_col=var_spec.output_value_col,
+        output_value_col=output_value_col or var_spec.output_value_col,
     )
     output_lf.collect().write_excel(
         output_obj,
@@ -124,12 +131,18 @@ def main() -> None:
             'generated (not including municipality number).'
         ),
     )
+    parser.add_argument(
+        '--output-value-col',
+        type=str,
+        required=False,
+    )
 
     args: argparse.Namespace = parser.parse_args()
 
     in_file: Path = args.in_file
     out_file: Path = args.out_file
     municipality_name: str = args.municipality_name
+    output_value_col: str|None = args.output_value_col
 
     maru_version: MaruVersion = args.version
     maru_cols: MaruCol = get_maru_cols(maru_version)
@@ -154,6 +167,7 @@ def main() -> None:
                 output_obj=output_obj,
                 var_spec=_var_spec,
                 maru_cols=maru_cols,
+                output_value_col=output_value_col,
             )
     except Exception as err:
         sys.stderr.write(

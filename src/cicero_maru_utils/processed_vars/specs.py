@@ -3,6 +3,7 @@
 This module contains specifications to use for output variables from processed
 MarU data, such as produced by the script `maru_xlsx_to_parquet.py`.
 """
+from collections.abc import Mapping
 import enum
 import typing as tp
 
@@ -46,7 +47,7 @@ def _process_energy_per_phase_kwh(
     )
 
 
-stavanger_output_specs_202508: tp.Final[tp.Mapping[str, OutputVarSpec]] = {
+stavanger_output_specs_202508: tp.Final[Mapping[str, OutputVarSpec]] = {
     StavangerOutputVarNames.ENERGY_PER_PHASE_KWH: OutputVarSpec(
         name=StavangerOutputVarNames.ENERGY_PER_PHASE_KWH,
         sheet_name=StavangerOutputVarNames.ENERGY_PER_PHASE_KWH,
