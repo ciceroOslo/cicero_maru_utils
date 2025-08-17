@@ -19,9 +19,9 @@ from xlsxwriter import Workbook as XlsxWorkbook
 
 from cicero_maru_utils.labels.columns import (
     MaruCol,
-    get_maru_cols
+    MaruVersion,
+    get_maru_cols,
 )
-
 
 
 OutputObj: tp.TypeAlias = XlsxWorkbook
@@ -33,6 +33,8 @@ class ProcessingFunc(tp.Protocol):
             self,
             df: pl.LazyFrame,
             *,
+            maru_cols: MaruCol,
+            output_var_name: str,
             output_value_col: str|None = None,
     ) -> pl.LazyFrame:
         ...
@@ -69,9 +71,11 @@ def get_output_obj(out_file: Path|tp.IO[bytes]) -> OutputObj:
 
 
 def process_and_write_output(
+        *,
         input_obj: InputObj,
         output_obj: OutputObj,
         var_spec: OutputVarSpec,
+        maru_cols: MaruCol,
 ) -> None:
     """Process input data into a single variable and write to output object."""
 
@@ -106,6 +110,13 @@ def main() -> None:
             'moment.'
         ),
     )
+    parser.add_argument(
+        '--version',
+        type=MaruVersion,
+        required=True,
+        choices=[_member for _member in MaruVersion],
+        help='MarU report release version of the data.',
+    )
 
     args: argparse.Namespace = parser.parse_args()
 
@@ -116,6 +127,9 @@ def main() -> None:
 
     input_obj: InputObj = get_input_data_obj(in_file)
     output_obj: OutputObj = get_output_obj(out_file)
+    maru_version: MaruVersion = args.version
+
+    maru_cols: MaruCol = get_maru_cols(maru_version)
 
     curr_var: str = '<no variables processed yet>'
     try:
@@ -126,6 +140,7 @@ def main() -> None:
                 input_obj=input_obj,
                 output_obj=output_obj,
                 var_spec=_var_spec,
+                maru_cols=maru_cols,
             )
     except Exception as err:
         sys.stderr.write(
