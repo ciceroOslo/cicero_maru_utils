@@ -76,9 +76,19 @@ def process_and_write_output(
         output_obj: OutputObj,
         var_spec: OutputVarSpec,
         maru_cols: MaruCol,
-) -> None:
+) -> pl.LazyFrame:
     """Process input data into a single variable and write to output object."""
-
+    output_lf: pl.LazyFrame = var_spec.processing_func(
+        df=input_obj,
+        maru_cols=maru_cols,
+        output_var_name=var_spec.name,
+        output_value_col=var_spec.output_value_col,
+    )
+    output_lf.collect().write_excel(
+        output_obj,
+        worksheet=var_spec.sheet_name,
+    )
+    return output_lf
 
 
 def main() -> None:
