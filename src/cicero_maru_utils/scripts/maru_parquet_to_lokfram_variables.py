@@ -180,3 +180,8 @@ def main() -> None:
         output_obj.close()
 
     print('Processing finished.')
+
+
+if __name__ == '__main__':
+    main()
+    sys.exit(0)
