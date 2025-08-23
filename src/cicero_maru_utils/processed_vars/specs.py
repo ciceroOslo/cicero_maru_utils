@@ -22,6 +22,7 @@ class StavangerOutputVarNames(enum.StrEnum):
     """Names of output variables for Stavanger."""
     ENERGY_SUM_KWH = 'maru_energibehov_sum_kwh'
     ENERGY_PER_PHASE_KWH = 'maru_energibehov_per_fase_kwh'
+    ENERGY_PER_GT_KWH = 'maru_energibehov_per_gt_kwh'
     FUEL_PER_GT_TONN = 'maru_fuel_per_gt_tonn'
 
 group_by_common: tp.Final[tp.Sequence[str]] = (
@@ -72,6 +73,26 @@ def _process_energy_per_phase_kwh(
     )
 
 
+def _process_energy_per_gt_kwh(
+        df: pl.LazyFrame,
+        *,
+        maru_cols: MaruCol,
+        output_var_name: str,
+        output_value_col: str|None = None,
+) -> pl.LazyFrame:
+    """Process energy per gross tonne group in kWh."""
+    if output_value_col is None:
+        output_value_col = maru_cols.energy_kwh
+    return (
+        df
+        .group_by(*group_by_common, maru_cols.gt_group)
+        .agg(
+            pl.sum(maru_cols.energy_kwh).alias(output_value_col)
+        )
+        .sort(cs.exclude(cs.by_name(output_value_col)))
+    )
+
+
 def _process_fuel_per_gt_tonn(
         df: pl.LazyFrame,
         *,
@@ -103,6 +124,11 @@ stavanger_output_specs_202508: tp.Final[Mapping[str, OutputVarSpec]] = {
         name=StavangerOutputVarNames.ENERGY_PER_PHASE_KWH,
         sheet_name=StavangerOutputVarNames.ENERGY_PER_PHASE_KWH,
         processing_func=_process_energy_per_phase_kwh
+    ),
+    StavangerOutputVarNames.ENERGY_PER_GT_KWH: OutputVarSpec(
+        name=StavangerOutputVarNames.ENERGY_PER_GT_KWH,
+        sheet_name=StavangerOutputVarNames.ENERGY_PER_GT_KWH,
+        processing_func=_process_energy_per_gt_kwh
     ),
     StavangerOutputVarNames.FUEL_PER_GT_TONN: OutputVarSpec(
         name=StavangerOutputVarNames.FUEL_PER_GT_TONN,
