@@ -4,7 +4,7 @@ This module contains specifications to use for output variables from processed
 MarU data, such as produced by the script `maru_xlsx_to_parquet.py`.
 """
 from collections.abc import Mapping
-import enum
+import dataclasses
 import typing as tp
 
 import polars as pl
@@ -18,7 +18,18 @@ from .types import (
 
 
 
-class StavangerOutputVarNames(enum.StrEnum):
+@dataclasses.dataclass(kw_only=True, slots=True)
+class StavangerOutputVars[_T]:
+    """Attributes for output variables for Stavanger."""
+    ENERGY_SUM_KWH: _T
+    ENERGY_PER_PHASE_KWH: _T
+    ENERGY_PER_GT_KWH: _T
+    ENERGY_PER_VOYAGE_TYPE_KWH: _T
+    FUEL_SUM_TONN: _T
+    FUEL_PER_GT_TONN: _T
+
+@dataclasses.dataclass(kw_only=True, slots=True)
+class StavangerOutputVarNames(StavangerOutputVars[str]):
     """Names of output variables for Stavanger."""
     ENERGY_SUM_KWH = 'maru_energibehov_sum_kwh'
     ENERGY_PER_PHASE_KWH = 'maru_energibehov_per_fase_kwh'
@@ -26,6 +37,11 @@ class StavangerOutputVarNames(enum.StrEnum):
     ENERGY_PER_VOYAGE_TYPE_KWH = 'maru_energibehov_per_voyage_type_kwh'
     FUEL_SUM_TONN = 'maru_fuel_sum_tonn'
     FUEL_PER_GT_TONN = 'maru_fuel_per_gt_tonn'
+
+@dataclasses.dataclass(kw_only=True, slots=True)
+class StavangerOutputSheetNames(StavangerOutputVarNames):
+    """Names of output worksheets for Stavanger."""
+    ENERGY_PER_VOYAGE_TYPE_KWH = 'maru_energ_per_voyage_type_kwh'
 
 group_by_common: tp.Final[tp.Sequence[str]] = (
     MaruCol.municipality_name,
@@ -159,32 +175,32 @@ def _process_fuel_per_gt_tonn(
 stavanger_output_specs_202508: tp.Final[Mapping[str, OutputVarSpec]] = {
     StavangerOutputVarNames.ENERGY_SUM_KWH: OutputVarSpec(
         name=StavangerOutputVarNames.ENERGY_SUM_KWH,
-        sheet_name=StavangerOutputVarNames.ENERGY_SUM_KWH,
+        sheet_name=StavangerOutputSheetNames.ENERGY_SUM_KWH,
         processing_func=_process_energy_sum_kwh
     ),
     StavangerOutputVarNames.ENERGY_PER_PHASE_KWH: OutputVarSpec(
         name=StavangerOutputVarNames.ENERGY_PER_PHASE_KWH,
-        sheet_name=StavangerOutputVarNames.ENERGY_PER_PHASE_KWH,
+        sheet_name=StavangerOutputSheetNames.ENERGY_PER_PHASE_KWH,
         processing_func=_process_energy_per_phase_kwh
     ),
     StavangerOutputVarNames.ENERGY_PER_GT_KWH: OutputVarSpec(
         name=StavangerOutputVarNames.ENERGY_PER_GT_KWH,
-        sheet_name=StavangerOutputVarNames.ENERGY_PER_GT_KWH,
+        sheet_name=StavangerOutputSheetNames.ENERGY_PER_GT_KWH,
         processing_func=_process_energy_per_gt_kwh
     ),
     StavangerOutputVarNames.ENERGY_PER_VOYAGE_TYPE_KWH: OutputVarSpec(
         name=StavangerOutputVarNames.ENERGY_PER_VOYAGE_TYPE_KWH,
-        sheet_name=StavangerOutputVarNames.ENERGY_PER_VOYAGE_TYPE_KWH,
+        sheet_name=StavangerOutputSheetNames.ENERGY_PER_VOYAGE_TYPE_KWH,
         processing_func=_process_energy_per_voyage_type_kwh
     ),
     StavangerOutputVarNames.FUEL_SUM_TONN: OutputVarSpec(
         name=StavangerOutputVarNames.FUEL_SUM_TONN,
-        sheet_name=StavangerOutputVarNames.FUEL_SUM_TONN,
+        sheet_name=StavangerOutputSheetNames.FUEL_SUM_TONN,
         processing_func=_process_fuel_sum_tonn
     ),
     StavangerOutputVarNames.FUEL_PER_GT_TONN: OutputVarSpec(
         name=StavangerOutputVarNames.FUEL_PER_GT_TONN,
-        sheet_name=StavangerOutputVarNames.FUEL_PER_GT_TONN,
+        sheet_name=StavangerOutputSheetNames.FUEL_PER_GT_TONN,
         processing_func=_process_fuel_per_gt_tonn
     ),
 }
