@@ -127,7 +127,10 @@ def _process_energy_per_voyage_type_kwh(
         output_value_col = maru_cols.energy_kwh
     return (
         df
-        .group_by(*group_by_common, maru_cols.voyage_type)
+        .group_by(
+            pl.col(*group_by_common, maru_cols.voyage_type)
+            .exclude(maru_cols.municipality_voyage_type)
+        )
         .agg(
             pl.sum(maru_cols.energy_kwh).alias(output_value_col)
         )
