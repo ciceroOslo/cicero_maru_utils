@@ -31,17 +31,21 @@ class StavangerOutputVars[_T]:
 @dataclasses.dataclass(kw_only=True, slots=True)
 class StavangerOutputVarNames(StavangerOutputVars[str]):
     """Names of output variables for Stavanger."""
-    ENERGY_SUM_KWH = 'maru_energibehov_sum_kwh'
-    ENERGY_PER_PHASE_KWH = 'maru_energibehov_per_fase_kwh'
-    ENERGY_PER_GT_KWH = 'maru_energibehov_per_gt_kwh'
-    ENERGY_PER_VOYAGE_TYPE_KWH = 'maru_energibehov_per_voyage_type_kwh'
-    FUEL_SUM_TONN = 'maru_fuel_sum_tonn'
-    FUEL_PER_GT_TONN = 'maru_fuel_per_gt_tonn'
+    ENERGY_SUM_KWH: str = 'maru_energibehov_sum_kwh'
+    ENERGY_PER_PHASE_KWH: str = 'maru_energibehov_per_fase_kwh'
+    ENERGY_PER_GT_KWH: str = 'maru_energibehov_per_gt_kwh'
+    ENERGY_PER_VOYAGE_TYPE_KWH: str = 'maru_energibehov_per_voyage_type_kwh'
+    FUEL_SUM_TONN: str = 'maru_fuel_sum_tonn'
+    FUEL_PER_GT_TONN: str = 'maru_fuel_per_gt_tonn'
+
+VAR_NAMES: tp.Final[StavangerOutputVarNames] = StavangerOutputVarNames()
 
 @dataclasses.dataclass(kw_only=True, slots=True)
 class StavangerOutputSheetNames(StavangerOutputVarNames):
     """Names of output worksheets for Stavanger."""
-    ENERGY_PER_VOYAGE_TYPE_KWH = 'maru_energ_per_voyage_type_kwh'
+    ENERGY_PER_VOYAGE_TYPE_KWH: str = 'maru_energ_per_voyage_type_kwh'
+
+SHEET_NAMES: tp.Final[StavangerOutputSheetNames] = StavangerOutputSheetNames()
 
 group_by_common: tp.Final[tp.Sequence[str]] = (
     MaruCol.municipality_name,
@@ -174,33 +178,33 @@ def _process_fuel_per_gt_tonn(
 
 stavanger_output_specs_202508: tp.Final[Mapping[str, OutputVarSpec]] = {
     StavangerOutputVarNames.ENERGY_SUM_KWH: OutputVarSpec(
-        name=StavangerOutputVarNames.ENERGY_SUM_KWH,
-        sheet_name=StavangerOutputSheetNames.ENERGY_SUM_KWH,
+        name=VAR_NAMES.ENERGY_SUM_KWH,
+        sheet_name=SHEET_NAMES.ENERGY_SUM_KWH,
         processing_func=_process_energy_sum_kwh
     ),
-    StavangerOutputVarNames.ENERGY_PER_PHASE_KWH: OutputVarSpec(
-        name=StavangerOutputVarNames.ENERGY_PER_PHASE_KWH,
-        sheet_name=StavangerOutputSheetNames.ENERGY_PER_PHASE_KWH,
+    VAR_NAMES.ENERGY_PER_PHASE_KWH: OutputVarSpec(
+        name=VAR_NAMES.ENERGY_PER_PHASE_KWH,
+        sheet_name=SHEET_NAMES.ENERGY_PER_PHASE_KWH,
         processing_func=_process_energy_per_phase_kwh
     ),
-    StavangerOutputVarNames.ENERGY_PER_GT_KWH: OutputVarSpec(
-        name=StavangerOutputVarNames.ENERGY_PER_GT_KWH,
-        sheet_name=StavangerOutputSheetNames.ENERGY_PER_GT_KWH,
+    VAR_NAMES.ENERGY_PER_GT_KWH: OutputVarSpec(
+        name=VAR_NAMES.ENERGY_PER_GT_KWH,
+        sheet_name=SHEET_NAMES.ENERGY_PER_GT_KWH,
         processing_func=_process_energy_per_gt_kwh
     ),
-    StavangerOutputVarNames.ENERGY_PER_VOYAGE_TYPE_KWH: OutputVarSpec(
-        name=StavangerOutputVarNames.ENERGY_PER_VOYAGE_TYPE_KWH,
-        sheet_name=StavangerOutputSheetNames.ENERGY_PER_VOYAGE_TYPE_KWH,
+    VAR_NAMES.ENERGY_PER_VOYAGE_TYPE_KWH: OutputVarSpec(
+        name=VAR_NAMES.ENERGY_PER_VOYAGE_TYPE_KWH,
+        sheet_name=SHEET_NAMES.ENERGY_PER_VOYAGE_TYPE_KWH,
         processing_func=_process_energy_per_voyage_type_kwh
     ),
-    StavangerOutputVarNames.FUEL_SUM_TONN: OutputVarSpec(
-        name=StavangerOutputVarNames.FUEL_SUM_TONN,
-        sheet_name=StavangerOutputSheetNames.FUEL_SUM_TONN,
+    VAR_NAMES.FUEL_SUM_TONN: OutputVarSpec(
+        name=VAR_NAMES.FUEL_SUM_TONN,
+        sheet_name=SHEET_NAMES.FUEL_SUM_TONN,
         processing_func=_process_fuel_sum_tonn
     ),
-    StavangerOutputVarNames.FUEL_PER_GT_TONN: OutputVarSpec(
-        name=StavangerOutputVarNames.FUEL_PER_GT_TONN,
-        sheet_name=StavangerOutputSheetNames.FUEL_PER_GT_TONN,
+    VAR_NAMES.FUEL_PER_GT_TONN: OutputVarSpec(
+        name=VAR_NAMES.FUEL_PER_GT_TONN,
+        sheet_name=SHEET_NAMES.FUEL_PER_GT_TONN,
         processing_func=_process_fuel_per_gt_tonn
     ),
 }
