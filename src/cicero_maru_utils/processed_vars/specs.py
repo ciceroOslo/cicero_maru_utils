@@ -23,6 +23,7 @@ class StavangerOutputVarNames(enum.StrEnum):
     ENERGY_SUM_KWH = 'maru_energibehov_sum_kwh'
     ENERGY_PER_PHASE_KWH = 'maru_energibehov_per_fase_kwh'
     ENERGY_PER_GT_KWH = 'maru_energibehov_per_gt_kwh'
+    ENERGY_PER_VOYAGE_TYPE_KWH = 'maru_energibehov_per_voyage_type_kwh'
     FUEL_SUM_TONN = 'maru_fuel_sum_tonn'
     FUEL_PER_GT_TONN = 'maru_fuel_per_gt_tonn'
 
@@ -94,6 +95,26 @@ def _process_energy_per_gt_kwh(
     )
 
 
+def _process_energy_per_voyage_type_kwh(
+        df: pl.LazyFrame,
+        *,
+        maru_cols: MaruCol,
+        output_var_name: str,
+        output_value_col: str|None = None,
+) -> pl.LazyFrame:
+    """Process energy per voyage type in kWh."""
+    if output_value_col is None:
+        output_value_col = maru_cols.energy_kwh
+    return (
+        df
+        .group_by(*group_by_common, maru_cols.voyage_type)
+        .agg(
+            pl.sum(maru_cols.energy_kwh).alias(output_value_col)
+        )
+        .sort(cs.exclude(cs.by_name(output_value_col)))
+    )
+
+
 def _process_fuel_sum_tonn(
         df: pl.LazyFrame,
         *,
@@ -150,6 +171,11 @@ stavanger_output_specs_202508: tp.Final[Mapping[str, OutputVarSpec]] = {
         name=StavangerOutputVarNames.ENERGY_PER_GT_KWH,
         sheet_name=StavangerOutputVarNames.ENERGY_PER_GT_KWH,
         processing_func=_process_energy_per_gt_kwh
+    ),
+    StavangerOutputVarNames.ENERGY_PER_VOYAGE_TYPE_KWH: OutputVarSpec(
+        name=StavangerOutputVarNames.ENERGY_PER_VOYAGE_TYPE_KWH,
+        sheet_name=StavangerOutputVarNames.ENERGY_PER_VOYAGE_TYPE_KWH,
+        processing_func=_process_energy_per_voyage_type_kwh
     ),
     StavangerOutputVarNames.FUEL_SUM_TONN: OutputVarSpec(
         name=StavangerOutputVarNames.FUEL_SUM_TONN,
