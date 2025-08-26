@@ -177,7 +177,7 @@ def _process_fuel_per_gt_tonn(
 
 
 stavanger_output_specs_202508: tp.Final[Mapping[str, OutputVarSpec]] = {
-    StavangerOutputVarNames.ENERGY_SUM_KWH: OutputVarSpec(
+    VAR_NAMES.ENERGY_SUM_KWH: OutputVarSpec(
         name=VAR_NAMES.ENERGY_SUM_KWH,
         sheet_name=SHEET_NAMES.ENERGY_SUM_KWH,
         processing_func=_process_energy_sum_kwh
