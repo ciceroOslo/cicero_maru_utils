@@ -331,4 +331,68 @@ stavanger_output_specs_202508: tp.Final[Mapping[str, OutputVarSpec]] = {
             ghg=GHG.CO2,
         )
     ),
+    VAR_NAMES.CO2_PER_PHASE_TONN: OutputVarSpec(
+        name=VAR_NAMES.CO2_PER_PHASE_TONN,
+        sheet_name=SHEET_NAMES.CO2_PER_PHASE_TONN,
+        processing_func=functools.partial(
+            _process_ghg_per_phase_tonn,
+            ghg=GHG.CO2,
+        )
+    ),
+    VAR_NAMES.CO2_PER_GT_TONN: OutputVarSpec(
+        name=VAR_NAMES.CO2_PER_GT_TONN,
+        sheet_name=SHEET_NAMES.CO2_PER_GT_TONN,
+        processing_func=functools.partial(
+            _process_ghg_per_gt_tonn,
+            ghg=GHG.CO2,
+        )
+    ),
+    VAR_NAMES.CH4_SUM_TONN: OutputVarSpec(
+        name=VAR_NAMES.CH4_SUM_TONN,
+        sheet_name=SHEET_NAMES.CH4_SUM_TONN,
+        processing_func=functools.partial(
+            _process_ghg_sum_tonn,
+            ghg=GHG.CH4,
+        )
+    ),
+    VAR_NAMES.CH4_PER_PHASE_TONN: OutputVarSpec(
+        name=VAR_NAMES.CH4_PER_PHASE_TONN,
+        sheet_name=SHEET_NAMES.CH4_PER_PHASE_TONN,
+        processing_func=functools.partial(
+            _process_ghg_per_phase_tonn,
+            ghg=GHG.CH4,
+        )
+    ),
+    VAR_NAMES.CH4_PER_GT_TONN: OutputVarSpec(
+        name=VAR_NAMES.CH4_PER_GT_TONN,
+        sheet_name=SHEET_NAMES.CH4_PER_GT_TONN,
+        processing_func=functools.partial(
+            _process_ghg_per_gt_tonn,
+            ghg=GHG.CH4,
+        )
+    ),
+    VAR_NAMES.N2O_SUM_TONN: OutputVarSpec(
+        name=VAR_NAMES.N2O_SUM_TONN,
+        sheet_name=SHEET_NAMES.N2O_SUM_TONN,
+        processing_func=functools.partial(
+            _process_ghg_sum_tonn,
+            ghg=GHG.N2O,
+        )
+    ),
+    VAR_NAMES.N2O_PER_PHASE_TONN: OutputVarSpec(
+        name=VAR_NAMES.N2O_PER_PHASE_TONN,
+        sheet_name=SHEET_NAMES.N2O_PER_PHASE_TONN,
+        processing_func=functools.partial(
+            _process_ghg_per_phase_tonn,
+            ghg=GHG.N2O,
+        )
+    ),
+    VAR_NAMES.N2O_PER_GT_TONN: OutputVarSpec(
+        name=VAR_NAMES.N2O_PER_GT_TONN,
+        sheet_name=SHEET_NAMES.N2O_PER_GT_TONN,
+        processing_func=functools.partial(
+            _process_ghg_per_gt_tonn,
+            ghg=GHG.N2O,
+        )
+    ),
 }
