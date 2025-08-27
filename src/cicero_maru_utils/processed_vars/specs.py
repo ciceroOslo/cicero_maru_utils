@@ -25,6 +25,7 @@ class GHG(enum.StrEnum):
     CO2 = enum.auto()
     CH4 = enum.auto()
     N2O = enum.auto()
+    CO2EQ = enum.auto()
 
 
 @dataclasses.dataclass(kw_only=True, slots=True)
@@ -45,6 +46,9 @@ class StavangerOutputVars[_T]:
     N2O_SUM_TONN: _T
     N2O_PER_PHASE_TONN: _T
     N2O_PER_GT_TONN: _T
+    CO2EQ_SUM_TONN: _T
+    CO2EQ_PER_PHASE_TONN: _T
+    CO2EQ_PER_GT_TONN: _T
 
 @dataclasses.dataclass(kw_only=True, slots=True)
 class StavangerOutputVarNames(StavangerOutputVars[str]):
@@ -64,6 +68,9 @@ class StavangerOutputVarNames(StavangerOutputVars[str]):
     N2O_SUM_TONN: str = 'maru_n2o_sum_tonn'
     N2O_PER_PHASE_TONN: str = 'maru_n2o_per_fase_tonn'
     N2O_PER_GT_TONN: str = 'maru_n2o_per_gt_tonn'
+    CO2EQ_SUM_TONN: str = 'maru_co2e_sum_tonn'
+    CO2EQ_PER_PHASE_TONN: str = 'maru_co2e_per_fase_tonn'
+    CO2EQ_PER_GT_TONN: str = 'maru_co2e_per_gt_tonn'
 
 VAR_NAMES: tp.Final[StavangerOutputVarNames] = StavangerOutputVarNames()
 
@@ -92,6 +99,7 @@ def _select_ghg_value_col(
         maru_cols.co2 if ghg == GHG.CO2 else
         maru_cols.ch4 if ghg == GHG.CH4 else
         maru_cols.n2o if ghg == GHG.N2O else
+        maru_cols.co2e if ghg == GHG.CO2EQ else
         ''
     )
     if data_value_col == '':
@@ -393,6 +401,30 @@ stavanger_output_specs_202508: tp.Final[Mapping[str, OutputVarSpec]] = {
         processing_func=functools.partial(
             _process_ghg_per_gt_tonn,
             ghg=GHG.N2O,
+        )
+    ),
+    VAR_NAMES.CO2EQ_SUM_TONN: OutputVarSpec(
+        name=VAR_NAMES.CO2EQ_SUM_TONN,
+        sheet_name=SHEET_NAMES.CO2EQ_SUM_TONN,
+        processing_func=functools.partial(
+            _process_ghg_sum_tonn,
+            ghg=GHG.CO2EQ,
+        )
+    ),
+    VAR_NAMES.CO2EQ_PER_PHASE_TONN: OutputVarSpec(
+        name=VAR_NAMES.CO2EQ_PER_PHASE_TONN,
+        sheet_name=SHEET_NAMES.CO2EQ_PER_PHASE_TONN,
+        processing_func=functools.partial(
+            _process_ghg_per_phase_tonn,
+            ghg=GHG.CO2EQ,
+        )
+    ),
+    VAR_NAMES.CO2EQ_PER_GT_TONN: OutputVarSpec(
+        name=VAR_NAMES.CO2EQ_PER_GT_TONN,
+        sheet_name=SHEET_NAMES.CO2EQ_PER_GT_TONN,
+        processing_func=functools.partial(
+            _process_ghg_per_gt_tonn,
+            ghg=GHG.CO2EQ,
         )
     ),
 }

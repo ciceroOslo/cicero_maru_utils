@@ -44,7 +44,7 @@ wheels = [
 
 [[package]]
 name = "cicero-maru-utils"
-version = "0.3.0.dev15"
+version = "0.3.0.dev16"
 source = { editable = "." }
 dependencies = [
     { name = "fastexcel" },
