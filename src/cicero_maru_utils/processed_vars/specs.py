@@ -36,6 +36,7 @@ class StavangerOutputVars[_T]:
     ENERGY_PER_GT_KWH: _T
     ENERGY_PER_VOYAGE_TYPE_KWH: _T
     FUEL_SUM_TONN: _T
+    FUEL_PER_PHASE_TONN: _T
     FUEL_PER_GT_TONN: _T
     CO2_SUM_TONN: _T
     CO2_PER_PHASE_TONN: _T
@@ -58,6 +59,7 @@ class StavangerOutputVarNames(StavangerOutputVars[str]):
     ENERGY_PER_GT_KWH: str = 'maru_energibehov_per_gt_kwh'
     ENERGY_PER_VOYAGE_TYPE_KWH: str = 'maru_energibehov_per_voyage_type_kwh'
     FUEL_SUM_TONN: str = 'maru_fuel_sum_tonn'
+    FUEL_PER_PHASE_TONN: str = 'maru_fuel_per_fase_tonn'
     FUEL_PER_GT_TONN: str = 'maru_fuel_per_gt_tonn'
     CO2_SUM_TONN: str = 'maru_co2_sum_tonn'
     CO2_PER_PHASE_TONN: str = 'maru_co2_per_fase_tonn'
@@ -279,6 +281,26 @@ def _process_fuel_sum_tonn(
     )
 
 
+def _process_fuel_per_phase_tonn(
+        df: pl.LazyFrame,
+        *,
+        maru_cols: MaruCol,
+        output_var_name: str,
+        output_value_col: str|None = None,
+) -> pl.LazyFrame:
+    """Process fuel per phase in tonnes."""
+    if output_value_col is None:
+        output_value_col = maru_cols.fuel
+    return (
+        df
+        .group_by(*group_by_common, maru_cols.phase)
+        .agg(
+            pl.sum(maru_cols.fuel).alias(output_value_col)
+        )
+        .sort(cs.exclude(cs.by_name(output_value_col)))
+    )
+
+
 def _process_fuel_per_gt_tonn(
         df: pl.LazyFrame,
         *,
@@ -325,6 +347,11 @@ stavanger_output_specs_202508: tp.Final[Mapping[str, OutputVarSpec]] = {
         name=VAR_NAMES.FUEL_SUM_TONN,
         sheet_name=SHEET_NAMES.FUEL_SUM_TONN,
         processing_func=_process_fuel_sum_tonn
+    ),
+    VAR_NAMES.FUEL_PER_PHASE_TONN: OutputVarSpec(
+        name=VAR_NAMES.FUEL_PER_PHASE_TONN,
+        sheet_name=SHEET_NAMES.FUEL_PER_PHASE_TONN,
+        processing_func=_process_fuel_per_phase_tonn
     ),
     VAR_NAMES.FUEL_PER_GT_TONN: OutputVarSpec(
         name=VAR_NAMES.FUEL_PER_GT_TONN,
