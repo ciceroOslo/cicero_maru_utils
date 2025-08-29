@@ -1,6 +1,6 @@
 [project]
 name = "cicero-maru-utils"
-version = "0.2.2"
+version = "0.3.0"
 description = "Utilities for processing and analyzing data from the maritime emissions model MarU from Kystverket"
 readme = "README.md"
 authors = [
@@ -10,10 +10,12 @@ requires-python = ">=3.13"
 dependencies = [
     "fastexcel>=0.14.0",
     "polars>=1.32.0",
+    "xlsxwriter>=3.2.5",
 ]
 
 [project.scripts]
-xlsx_to_parquet = "cicero_maru_utils.scripts.xlsx_to_parquet:main"
+maru_xlsx_to_parquet = "cicero_maru_utils.scripts.xlsx_to_parquet:main"
+maru_parquet_to_lokfram_variables = "cicero_maru_utils.scripts.maru_parquet_to_lokfram_variables:main"
 
 [build-system]
 requires = ["uv_build>=0.8.4,<0.9.0"]
